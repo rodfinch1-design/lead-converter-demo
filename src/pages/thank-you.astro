@@ -58,6 +58,7 @@ const sim = !leadWebhook;   // no CRM wired: simulate what the CRM would send, c
     .bubble { max-width: 88%; border-radius: 18px; padding: 10px 14px; font-size: .95rem; line-height: 1.4; }
     .bubble.in { background: #e9edf2; color: var(--ink); border-bottom-left-radius: 6px; animation: pop .25s ease-out; }
     .typing { display: inline-flex; gap: 5px; background: #e9edf2; }
+    [hidden] { display: none !important; }   /* the typing bubble's display rule must not beat the hidden attribute */
     .typing span { width: 7px; height: 7px; border-radius: 50%; background: #8a97a8; animation: blink 1s infinite; }
     .typing span:nth-child(2) { animation-delay: .2s } .typing span:nth-child(3) { animation-delay: .4s }
     .stamp { font-size: .75rem; color: var(--muted); margin-top: 6px; }
