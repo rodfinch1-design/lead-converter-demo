@@ -84,11 +84,11 @@ const sim = !leadWebhook;   // no CRM wired: simulate what the CRM would send, c
         var clock = document.getElementById('sim-clock'), done = false;
         (function tick() { if (!done) { clock.textContent = ((Date.now() - t0) / 1000).toFixed(1) + ' s'; requestAnimationFrame(tick); } })();
         var who = (lead && lead.name ? lead.name.split(' ')[0] : 'there');
-        var need = (lead && lead.need ? lead.need.toLowerCase() : 'your AC');
+        var need = (lead && lead.need ? lead.need : 'your AC');
         setTimeout(function () { document.getElementById('sim-typing').hidden = false; }, 1500);
         setTimeout(function () {
           document.getElementById('sim-typing').hidden = true;
-          msg.textContent = 'Hi ' + who + ', this is ' + bizName + '. We got your request (' + need + '). A tech can be at your place today between 2 and 4 pm. Reply 1 to book that window, or call ' + phone + '.';
+          msg.textContent = 'Hi ' + who + ', this is ' + bizName + '. Got your request: ' + need + '. A tech can be at your place today between 2 and 4 pm. Reply 1 to book that window, or call ' + phone + '.';
           msg.hidden = false; done = true;
           var secs = ((Date.now() - t0) / 1000).toFixed(1);
           var st = document.getElementById('sim-stamp'); st.textContent = 'Delivered · ' + secs + ' s after you hit submit'; st.hidden = false;
