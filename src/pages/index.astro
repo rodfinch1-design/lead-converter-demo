@@ -1,0 +1,181 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import LeadForm from '../components/LeadForm.astro';
+import { biz } from '../config';
+import hero from '../assets/hero.png';
+import door from '../assets/door.png';
+import van from '../assets/van.png';
+
+const s = biz.demo ? 'sample ' : '';
+const steps = [
+  ['Tell us what’s wrong', 'Three quick questions or one phone call. Takes about a minute.'],
+  ['We text you back in under 60 seconds', 'A real person confirms the price range and books a time that suits you, today when you need it.'],
+  ['Fixed right, at the price we quoted', 'A licensed tech arrives on time, shows you the problem, and fixes it. Guaranteed for a year.'],
+];
+const services = [
+  ['AC repair', 'Not cooling, won’t start, frozen coil, leaks. Same-day across ' + biz.city + '.'],
+  ['AC tune-up', 'A 21-point check that catches failures before the hottest week of the year.'],
+  ['New AC systems', 'Honest sizing, upfront quotes, financing available, clean install.'],
+  ['Heating repair', 'Heat pumps and furnaces for the few cold nights we do get.'],
+  ['Indoor air quality', 'Filters, UV lights and humidity control for allergies and mildew.'],
+  ['Ductwork', 'Leaks and blockages that waste up to a third of your cooling.'],
+];
+const reviews = [
+  ['AC quit at 9pm in July. Texted back in under a minute, tech was here by 8am and it was fixed by 9. Price was exactly what they said.', 'Maria G.', 'Brandon'],
+  ['They showed me photos of the bad capacitor before touching anything. No upsell, no pressure. That’s who I’m calling from now on.', 'James R.', 'St. Petersburg'],
+  ['Got three quotes for a new system. Coolside wasn’t the cheapest, but they were the only ones who measured the house. Cooler and our bill dropped.', 'Denise & Tom W.', 'Riverview'],
+];
+const faqs = [
+  ['How fast can you get here?', `Most calls in ${biz.city} get a same-day visit. Text or call and we’ll give you an exact arrival window within a minute.`],
+  ['How much will it cost?', `The diagnostic is $${biz.diagnostic}, and it’s waived if you go ahead with the repair. You get a flat, upfront price before any work starts. No surprises on the bill.`],
+  ['Are you licensed and insured?', `Yes. ${biz.license}. Every technician is background-checked and insured.`],
+  ['What if the problem comes back?', 'Every repair is guaranteed for a full year on parts and labor. If it fails, we come back and fix it free.'],
+  ['Do you offer financing?', 'Yes, on new systems and larger repairs, with options from 0% for qualified buyers.'],
+];
+---
+<Base title={`AC Repair ${biz.city} | Same-Day Service | ${biz.name}`}
+      description={`Same-day AC repair across ${biz.city}. Upfront pricing, licensed techs, 1-year guarantee. Text or call ${biz.phone}. We reply in under 60 seconds.`}>
+  <header class="site">
+    <div class="wrap">
+      <a class="logo" href="#top" aria-label={`${biz.name} home`}>
+        <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="#0b5fa5"/><path d="M17 7v20M8.3 12l17.4 10M8.3 22l17.4-10" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+        <span>{biz.name}</span>
+      </a>
+      <a class="head-phone" href={biz.phoneHref} data-place="header">{biz.phone}</a>
+      <a class="btn btn-cta head-call" href={biz.phoneHref} data-place="header-btn">Call now</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="rating"><span class="stars" aria-hidden="true">★★★★★</span> {biz.rating} from {biz.reviewCount} {s}reviews</div>
+          <h1>AC out? We’ll have you cool again today.</h1>
+          <p class="lead">Same-day AC repair across {biz.city}. You get the price before we start: no surprises, no pressure.</p>
+          <ul class="checks">
+            <li>Same-day service, 7 days a week</li>
+            <li>Upfront, flat-rate pricing</li>
+            <li>Licensed &amp; insured technicians</li>
+            <li>Every repair guaranteed for 1 year</li>
+          </ul>
+          <div class="hero-ctas">
+            <a class="btn btn-cta" href="#quote" data-place="hero">Get my same-day quote</a>
+            <a class="btn btn-ghost" href={biz.phoneHref} data-place="hero">Call {biz.phone}</a>
+          </div>
+          <div class="hero-photo">
+            <Image src={hero} alt="A Coolside technician checking the pressures on a home’s outdoor AC unit" widths={[360, 560, 800, 1200]} sizes="(min-width: 960px) 560px, calc(100vw - 32px)" loading="eager" fetchpriority="high" />
+          </div>
+        </div>
+        <LeadForm />
+      </div>
+    </section>
+
+    <div class="trust">
+      <ul class="wrap">
+        <li>✔ Licensed &amp; insured</li><li>✔ Background-checked techs</li><li>✔ 1-year repair guarantee</li><li>✔ Financing available</li><li>✔ {biz.hours}</li>
+      </ul>
+    </div>
+
+    <section>
+      <div class="wrap">
+        <p class="eyebrow center">How it works</p>
+        <h2 class="center">Cool again in three steps</h2>
+        <div class="grid-3" style="margin-top:28px">
+          {steps.map(([t, d], i) => (
+            <div class="card step"><span class="num">{i + 1}</span><h3>{t}</h3><p>{d}</p></div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="soft">
+      <div class="wrap split">
+        <Image src={door} alt="A technician explaining a repair to a homeowner at her front door" widths={[360, 560, 800, 1100]} sizes="(min-width: 900px) 540px, calc(100vw - 32px)" loading="lazy" />
+        <div>
+          <p class="eyebrow">Why homeowners call us back</p>
+          <h2>No surprises. Ever.</h2>
+          <p class="lead">You see the problem, you get the price, then we fix it. If anything we fixed fails within a year, we come back free.</p>
+          <p class="price">${biz.diagnostic} <span style="font-size:1rem;font-weight:600;color:var(--muted)">diagnostic, waived with any repair</span></p>
+          <a class="btn btn-cta" href="#quote" data-place="pricing" style="margin-top:12px">Get my upfront price</a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <p class="eyebrow center">Services</p>
+        <h2 class="center">Everything that keeps your home comfortable</h2>
+        <div class="grid-3" style="margin-top:28px">
+          {services.map(([t, d]) => (
+            <div class="svc"><span class="ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg></span><div><h3>{t}</h3><p>{d}</p></div></div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="soft">
+      <div class="wrap">
+        <p class="eyebrow center">Reviews</p>
+        <h2 class="center">{biz.rating}★ from {biz.reviewCount} {s}reviews</h2>
+        <div class="grid-3" style="margin-top:28px">
+          {reviews.map(([q, who, where]) => (
+            <figure class="card review" style="margin:0">
+              {biz.demo && <span class="tag">Sample review</span>}
+              <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <blockquote style="margin:8px 0 0">“{q}”</blockquote>
+              <figcaption class="who">{who} <small>{where}</small></figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap split">
+        <div>
+          <p class="eyebrow">Service area</p>
+          <h2>Serving all of {biz.city}</h2>
+          <p class="lead">Fully stocked vans are spread across the bay, so a tech is usually close by.</p>
+          <ul class="areas">{biz.areas.map((a) => <li>{a}</li>)}</ul>
+        </div>
+        <Image src={van} alt="A stocked service van in a driveway with its rear doors open" widths={[360, 560, 800, 1100]} sizes="(min-width: 900px) 540px, calc(100vw - 32px)" loading="lazy" />
+      </div>
+    </section>
+
+    <section class="soft">
+      <div class="wrap">
+        <p class="eyebrow center">Questions</p>
+        <h2 class="center">Before you call</h2>
+        <div class="faq" style="margin-top:20px">
+          {faqs.map(([q, a]) => (<details><summary>{q}</summary><p>{a}</p></details>))}
+        </div>
+      </div>
+    </section>
+
+    <section class="final">
+      <div class="wrap center">
+        <h2>Hot house? Let’s fix it today.</h2>
+        <p class="lead">Text or call now. We reply in under {biz.responseSeconds} seconds, 7 days a week.</p>
+        <div class="hero-ctas" style="justify-content:center">
+          <a class="btn btn-cta" href="#quote" data-place="final">Get my same-day quote</a>
+          <a class="btn btn-ghost" href={biz.phoneHref} data-place="final">Call {biz.phone}</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site">
+    <div class="wrap">
+      <p><strong>{biz.name}</strong> · {biz.city}, FL · <a href={biz.phoneHref} data-place="footer">{biz.phone}</a> · {biz.hours}</p>
+      <p>{biz.license}{biz.demo && ' · Demo site: a sample business built for a Service Hawk tutorial.'}</p>
+    </div>
+  </footer>
+
+  <nav class="sticky-bar" aria-label="Quick contact">
+    <a class="btn btn-ghost" href={biz.phoneHref} data-place="sticky">Call</a>
+    <a class="btn btn-ghost" href={biz.smsHref} data-place="sticky">Text</a>
+    <a class="btn btn-cta" href="#quote" data-place="sticky">Get quote</a>
+  </nav>
+</Base>

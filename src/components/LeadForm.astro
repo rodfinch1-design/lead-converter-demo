@@ -1,0 +1,79 @@
+---
+import { biz, leadWebhook } from '../config';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<div class="card form-card" id="quote">
+  <h2>Get a callback in 5 minutes</h2>
+  <p class="sub">Tell us what's going on. We text you back in under {biz.responseSeconds} seconds.</p>
+  <form id="lead-form" novalidate data-webhook={leadWebhook} data-thanks={`${base}/thank-you/`}>
+    <div class="field">
+      <label for="name">Your name</label>
+      <input id="name" name="name" autocomplete="name" required maxlength="60" />
+      <span class="err" id="name-err" aria-live="polite"></span>
+    </div>
+    <div class="field">
+      <label for="phone">Mobile phone</label>
+      <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="(813) 555-0100" />
+      <span class="err" id="phone-err" aria-live="polite"></span>
+    </div>
+    <div class="field">
+      <label for="need">What's going on?</label>
+      <select id="need" name="need" required>
+        <option value="">Choose one</option>
+        <option>AC not cooling</option>
+        <option>AC won't turn on</option>
+        <option>Strange noise or water leak</option>
+        <option>Tune-up / maintenance</option>
+        <option>Quote for a new system</option>
+        <option>Something else</option>
+      </select>
+      <span class="err" id="need-err" aria-live="polite"></span>
+    </div>
+    <div class="hp" aria-hidden="true"><label for="company">Company</label><input id="company" name="company" tabindex="-1" autocomplete="off" /></div>
+    <button class="btn btn-cta btn-block" type="submit" id="lead-submit">Text me my quote</button>
+    <p class="consent">By submitting, you agree to receive calls and texts from {biz.name} about your request, including automated texts. Consent isn't a condition of purchase. Msg &amp; data rates may apply. Reply STOP to opt out.</p>
+    <p class="promise">⚡ Average reply: under {biz.responseSeconds} seconds</p>
+  </form>
+</div>
+
+<script is:inline>
+(function () {
+  var form = document.getElementById('lead-form'); if (!form) return;
+  var started = false;
+  form.addEventListener('input', function () { if (!started) { started = true; track('form_start'); } }, { once: false });
+
+  // keep where the visitor came from with the lead: ad, Google, a post, a QR code...
+  var q = new URLSearchParams(location.search), keep = {};
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'].forEach(function (k) { if (q.get(k)) keep[k] = q.get(k); });
+  try { if (Object.keys(keep).length) sessionStorage.setItem('lc_src', JSON.stringify(keep)); keep = JSON.parse(sessionStorage.getItem('lc_src') || '{}'); } catch (e) {}
+
+  function digits(s) { return (s || '').replace(/\D/g, ''); }
+  function setErr(id, msg) { document.getElementById(id + '-err').textContent = msg || ''; document.getElementById(id).setAttribute('aria-invalid', msg ? 'true' : 'false'); }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = form.name.value.trim(), phone = digits(form.phone.value), need = form.need.value;
+    if (phone.length === 11 && phone[0] === '1') phone = phone.slice(1);
+    var ok = true;
+    setErr('name', name.length < 2 ? 'Please enter your name.' : ''); if (name.length < 2) ok = false;
+    setErr('phone', phone.length !== 10 ? 'Please enter a 10-digit mobile number.' : ''); if (phone.length !== 10) ok = false;
+    setErr('need', need ? '' : 'Pick the closest option.'); if (!need) ok = false;
+    if (!ok) { track('form_error'); return; }
+    if (form.company.value) return;                         // honeypot: bots fill hidden fields, people don't
+
+    var lead = Object.assign({ name: name, phone: '+1' + phone, need: need, page: location.href, referrer: document.referrer,
+      submitted_at: new Date().toISOString() }, keep);
+    var btn = document.getElementById('lead-submit'); btn.disabled = true; btn.textContent = 'Sending…';
+    try { sessionStorage.setItem('lc_lead', JSON.stringify(lead)); } catch (e) {}
+    track('generate_lead', { need: need });
+
+    var go = function () { location.href = form.dataset.thanks; };
+    var hook = form.dataset.webhook;
+    if (!hook) { go(); return; }                            // demo mode: no CRM wired yet
+    // CRM inbound webhook (GHL): 'no-cors' delivers the POST without needing the CRM to send CORS headers
+    fetch(hook, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(lead), keepalive: true })
+      .finally(go);
+    setTimeout(go, 2500);                                   // never strand the visitor if the network is slow
+  });
+})();
+</script>

@@ -1,0 +1,38 @@
+---
+import Base from '../layouts/Base.astro';
+import { biz, leadWebhook } from '../config';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<Base title={`Thanks! | ${biz.name}`} description="We got your request." noindex={true}>
+  <main class="wrap ty center">
+    <div class="big" aria-hidden="true">✅</div>
+    <h1 id="ty-title">Got it! Watch your phone.</h1>
+    <p class="lead">We’ll text you in under {biz.responseSeconds} seconds to confirm your price range and book a time.</p>
+    <div class="card" style="max-width:640px;margin:28px auto;text-align:left">
+      <h2 style="font-size:1.2rem">What happens next</h2>
+      <ol>
+        <li>A text from {biz.short} arrives (check your messages).</li>
+        <li>Reply with a time that works, or tap the booking link in the text.</li>
+        <li>A licensed tech arrives in your window and quotes before any work starts.</li>
+      </ol>
+      <p style="margin:0">In a hurry? Call <a href={biz.phoneHref} data-place="thanks">{biz.phone}</a>.</p>
+    </div>
+    {!leadWebhook && (
+      <div style="max-width:640px;margin:0 auto">
+        <p class="eyebrow">Demo mode: the lead that would go to the CRM</p>
+        <pre class="demo-payload" id="payload">(submit the form on the home page to see the lead here)</pre>
+      </div>
+    )}
+    <p><a href={`${base}/`}>← Back to the home page</a></p>
+  </main>
+  <script is:inline>
+    try {
+      var lead = JSON.parse(sessionStorage.getItem('lc_lead') || 'null');
+      if (lead) {
+        var first = (lead.name || '').split(' ')[0];
+        if (first) document.getElementById('ty-title').textContent = 'Got it, ' + first + '! Watch your phone.';
+        var p = document.getElementById('payload'); if (p) p.textContent = JSON.stringify(lead, null, 2);
+      }
+    } catch (e) {}
+  </script>
+</Base>
