@@ -2,12 +2,34 @@
 import Base from '../layouts/Base.astro';
 import { biz, leadWebhook } from '../config';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const sim = !leadWebhook;   // no CRM wired: simulate what the CRM would send, clearly labeled
 ---
 <Base title={`Thanks! | ${biz.name}`} description="We got your request." noindex={true}>
   <main class="wrap ty center">
     <div class="big" aria-hidden="true">✅</div>
     <h1 id="ty-title">Got it! Watch your phone.</h1>
     <p class="lead">We’ll text you in under {biz.responseSeconds} seconds to confirm your price range and book a time.</p>
+
+    {sim && (
+      <div class="sim">
+        <p class="eyebrow">Demo simulation: what the CRM sends automatically</p>
+        <div class="sim-row">
+          <div class="phone" aria-live="polite">
+            <div class="phone-top"><span class="clock" id="sim-clock">0.0 s</span><span>Messages</span></div>
+            <div class="thread-head">{biz.name}</div>
+            <div class="bubble typing" id="sim-typing" hidden><span></span><span></span><span></span></div>
+            <div class="bubble in" id="sim-msg" hidden></div>
+            <div class="stamp" id="sim-stamp" hidden></div>
+          </div>
+          <div class="alert-card" id="sim-alert" hidden>
+            <div class="alert-title">🔔 New lead: reply within 5 minutes</div>
+            <div id="sim-alert-body"></div>
+          </div>
+        </div>
+        <p class="sim-note">Simulated in demo mode. In a live setup this text is sent by the CRM (e.g. a GHL workflow) the moment the form is submitted, and the owner gets the alert.</p>
+      </div>
+    )}
+
     <div class="card" style="max-width:640px;margin:28px auto;text-align:left">
       <h2 style="font-size:1.2rem">What happens next</h2>
       <ol>
@@ -17,7 +39,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       </ol>
       <p style="margin:0">In a hurry? Call <a href={biz.phoneHref} data-place="thanks">{biz.phone}</a>.</p>
     </div>
-    {!leadWebhook && (
+    {sim && (
       <div style="max-width:640px;margin:0 auto">
         <p class="eyebrow">Demo mode: the lead that would go to the CRM</p>
         <pre class="demo-payload" id="payload">(submit the form on the home page to see the lead here)</pre>
@@ -25,13 +47,58 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     )}
     <p><a href={`${base}/`}>← Back to the home page</a></p>
   </main>
-  <script is:inline>
+
+  <style>
+    .sim { max-width: 760px; margin: 28px auto 0; }
+    .sim-row { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; }
+    .phone { width: 300px; min-height: 300px; border-radius: 34px; border: 10px solid #12202f; background: #fff; padding: 10px 14px 18px; text-align: left; box-shadow: var(--shadow); }
+    .phone-top { display: flex; justify-content: space-between; font-size: .8rem; color: var(--muted); font-weight: 700; margin-bottom: 10px; }
+    .clock { font-variant-numeric: tabular-nums; color: var(--ok); }
+    .thread-head { text-align: center; font-weight: 700; font-size: .9rem; padding-bottom: 8px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+    .bubble { max-width: 88%; border-radius: 18px; padding: 10px 14px; font-size: .95rem; line-height: 1.4; }
+    .bubble.in { background: #e9edf2; color: var(--ink); border-bottom-left-radius: 6px; animation: pop .25s ease-out; }
+    .typing { display: inline-flex; gap: 5px; background: #e9edf2; }
+    .typing span { width: 7px; height: 7px; border-radius: 50%; background: #8a97a8; animation: blink 1s infinite; }
+    .typing span:nth-child(2) { animation-delay: .2s } .typing span:nth-child(3) { animation-delay: .4s }
+    .stamp { font-size: .75rem; color: var(--muted); margin-top: 6px; }
+    .alert-card { width: 300px; text-align: left; background: #fff; border: 1px solid var(--line); border-left: 6px solid var(--cta); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); font-size: .92rem; animation: pop .25s ease-out; }
+    .alert-title { font-weight: 800; margin-bottom: 6px; }
+    .sim-note { font-size: .8rem; color: var(--muted); margin-top: 14px; }
+    @keyframes blink { 0%, 100% { opacity: .3 } 50% { opacity: 1 } }
+    @keyframes pop { from { transform: translateY(6px); opacity: 0 } to { transform: none; opacity: 1 } }
+    @media (prefers-reduced-motion: reduce) { .bubble.in, .alert-card, .typing span { animation: none } }
+  </style>
+
+  <script is:inline define:vars={{ bizName: biz.name, phone: biz.phone }}>
     try {
       var lead = JSON.parse(sessionStorage.getItem('lc_lead') || 'null');
       if (lead) {
         var first = (lead.name || '').split(' ')[0];
         if (first) document.getElementById('ty-title').textContent = 'Got it, ' + first + '! Watch your phone.';
         var p = document.getElementById('payload'); if (p) p.textContent = JSON.stringify(lead, null, 2);
+      }
+      var msg = document.getElementById('sim-msg');
+      if (msg) {
+        // the stopwatch starts at the moment the form was submitted
+        var t0 = lead && lead.submitted_at ? Date.parse(lead.submitted_at) : Date.now();
+        var clock = document.getElementById('sim-clock'), done = false;
+        (function tick() { if (!done) { clock.textContent = ((Date.now() - t0) / 1000).toFixed(1) + ' s'; requestAnimationFrame(tick); } })();
+        var who = (lead && lead.name ? lead.name.split(' ')[0] : 'there');
+        var need = (lead && lead.need ? lead.need.toLowerCase() : 'your AC');
+        setTimeout(function () { document.getElementById('sim-typing').hidden = false; }, 1500);
+        setTimeout(function () {
+          document.getElementById('sim-typing').hidden = true;
+          msg.textContent = 'Hi ' + who + ', this is ' + bizName + '. We got your request (' + need + '). A tech can be at your place today between 2 and 4 pm. Reply 1 to book that window, or call ' + phone + '.';
+          msg.hidden = false; done = true;
+          var secs = ((Date.now() - t0) / 1000).toFixed(1);
+          var st = document.getElementById('sim-stamp'); st.textContent = 'Delivered · ' + secs + ' s after you hit submit'; st.hidden = false;
+          var a = document.getElementById('sim-alert');
+          var body = document.getElementById('sim-alert-body');      // textContent only: the name is visitor input
+          [(lead ? lead.name : 'Lead') + ' · ' + (lead ? lead.phone : ''), lead ? lead.need : '',
+           'Source: ' + (lead && lead.utm_source ? lead.utm_source + ' / ' + (lead.utm_medium || '') : 'direct')]
+            .forEach(function (line, i) { var d = document.createElement('div'); d.textContent = line; if (!i) d.style.fontWeight = '700'; body.appendChild(d); });
+          a.hidden = false;
+        }, 4200);
       }
     } catch (e) {}
   </script>
