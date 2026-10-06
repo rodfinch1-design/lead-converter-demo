@@ -1,5 +1,8 @@
 ---
 import { biz, leadWebhook } from '../config';
+interface Props { need?: string }
+const { need = '' } = Astro.props;
+const needs = ['AC not cooling', "AC won't turn on", 'Strange noise or water leak', 'Tune-up / maintenance', 'Quote for a new system', 'Something else'];
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 <div class="card form-card" id="quote">
@@ -20,12 +23,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       <label for="need">What's going on?</label>
       <select id="need" name="need" required>
         <option value="">Choose one</option>
-        <option>AC not cooling</option>
-        <option>AC won't turn on</option>
-        <option>Strange noise or water leak</option>
-        <option>Tune-up / maintenance</option>
-        <option>Quote for a new system</option>
-        <option>Something else</option>
+        {needs.map((n) => <option selected={n === need}>{n}</option>)}
       </select>
       <span class="err" id="need-err" aria-live="polite"></span>
     </div>

@@ -9,6 +9,8 @@ export const biz = {
   phoneHref: 'tel:+18135550142',
   smsHref: 'sms:+18135550142',
   hours: 'Open 7 days, 7am–9pm',
+  opens: '07:00', closes: '21:00',
+  base: 'Tampa',                                // where the vans start each day (the address stays hidden: a service-area business)
   license: 'State license #CAC1800000 (sample)',
   rating: 4.9,
   reviewCount: 312,
@@ -18,6 +20,11 @@ export const biz = {
 
 // Lead delivery. PUBLIC_LEAD_WEBHOOK = the CRM's inbound webhook (e.g. a GHL workflow trigger).
 // Empty = demo mode: the lead is shown on the thank-you page instead of being sent.
+// Search: the demo stays out of Google (a made-up business must never show up in real searches).
+// PUBLIC_INDEXABLE=1 builds the same site the way a real client's would go live: indexable, with a sitemap.
+export const indexable = import.meta.env.PUBLIC_INDEXABLE === '1';
+export const noindex = biz.demo && !indexable;
+
 export const leadWebhook = import.meta.env.PUBLIC_LEAD_WEBHOOK ?? '';
 export const ga4Id = import.meta.env.PUBLIC_GA4_ID ?? '';
 export const clarityId = import.meta.env.PUBLIC_CLARITY_ID ?? '';

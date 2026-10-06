@@ -1,16 +1,22 @@
 ---
 import '../styles/global.css';
-import { biz, ga4Id, clarityId } from '../config';
-interface Props { title: string; description: string; noindex?: boolean }
-const { title, description, noindex = biz.demo } = Astro.props;
+import { biz, ga4Id, clarityId, noindex as demoNoindex } from '../config';
+interface Props { title: string; description: string; noindex?: boolean; trail?: [string, string][]; schema?: object[] }
+const { title, description, noindex = demoNoindex, trail = [], schema = [] } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const home = new URL(`${base}/`, Astro.site).href;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
-// LocalBusiness schema (no review/rating markup: the demo's reviews are samples, and markup must only describe real reviews)
-const schema = {
-  '@context': 'https://schema.org', '@type': 'HVACBusiness', name: biz.name, telephone: biz.phone,
+// The business, described once and referenced by id from every page. A service-area business: city only, no street.
+// No review/rating markup: the demo's reviews are samples, and Google ignores self-hosted review stars for local businesses anyway.
+const business = {
+  '@type': 'HVACBusiness', '@id': `${home}#business`, name: biz.name, url: home, telephone: biz.phoneHref.replace('tel:', ''),
+  address: { '@type': 'PostalAddress', addressLocality: biz.base, addressRegion: 'FL', addressCountry: 'US' },
   areaServed: biz.areas.map((a) => ({ '@type': 'City', name: `${a}, FL` })),
-  openingHours: 'Mo-Su 07:00-21:00', priceRange: '$$', url: canonical,
+  openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], opens: biz.opens, closes: biz.closes }],
+  priceRange: '$$', sameAs: [],
 };
+const crumbs = trail.length > 1 ? [{ '@type': 'BreadcrumbList', itemListElement: trail.map(([name, href], i) => ({ '@type': 'ListItem', position: i + 1, name, item: new URL(href, Astro.site).href })) }] : [];
+const graph = { '@context': 'https://schema.org', '@graph': [business, ...crumbs, ...schema] };
 ---
 <!doctype html>
 <html lang="en">
@@ -24,16 +30,17 @@ const schema = {
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonical} />
   <meta name="theme-color" content="#08497f" />
   <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(graph)} />
   <script is:inline>window.dataLayer = window.dataLayer || []; function track(e, p) { window.dataLayer.push(Object.assign({ event: e }, p || {})); }</script>
   {ga4Id && <script async src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}></script>}
   {ga4Id && <script is:inline define:vars={{ ga4Id }}>function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ga4Id);</script>}
   {clarityId && <script is:inline define:vars={{ clarityId }}>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script",clarityId);</script>}
 </head>
 <body>
-  {biz.demo && <div class="demo" role="note"><strong>Demo site</strong> built for a Service Hawk tutorial. {biz.name} is a sample business; the phone number and reviews are samples.</div>}
+  {biz.demo && <div class="demo" role="note"><strong>Demo site</strong> built for a Service Hawk tutorial. {biz.name} is a sample business; the phone number, prices and reviews are samples.</div>}
   <slot />
   <script is:inline>
     // every tap on a phone or text link is a conversion we can count

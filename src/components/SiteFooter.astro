@@ -1,0 +1,24 @@
+---
+import { biz } from '../config';
+import { services } from '../data/services';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<footer class="site">
+  <div class="wrap foot-grid">
+    <div>
+      <p><strong>{biz.name}</strong><br />Serving {biz.city}, FL · <a href={biz.phoneHref} data-place="footer">{biz.phone}</a><br />{biz.hours}</p>
+      <p>{biz.license}{biz.demo && ' · Demo site: a sample business built for a Service Hawk tutorial.'}</p>
+    </div>
+    <nav aria-label="Services"><p class="foot-h">Services</p>{services.map((s) => <a href={`${base}/services/${s.slug}/`}>{s.name}</a>)}</nav>
+    <nav aria-label="More"><p class="foot-h">More</p>
+      <a href={`${base}/service-area/`}>Service area</a>
+      <a href={`${base}/service-area/clearwater/`}>AC repair in Clearwater</a>
+      <a href={`${base}/ac-repair-cost/`}>AC repair prices</a>
+    </nav>
+  </div>
+</footer>
+<nav class="sticky-bar" aria-label="Quick contact">
+  <a class="btn btn-ghost" href={biz.phoneHref} data-place="sticky">Call</a>
+  <a class="btn btn-ghost" href={biz.smsHref} data-place="sticky">Text</a>
+  <a class="btn btn-cta" href="#quote" data-place="sticky">Get quote</a>
+</nav>

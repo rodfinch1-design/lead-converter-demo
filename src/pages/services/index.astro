@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { biz } from '../../config';
+import { services } from '../../data/services';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const trail: [string, string][] = [['Home', `${base}/`], ['Services', `${base}/services/`]];
+---
+<Base title={`HVAC Services in ${biz.city}, FL | ${biz.name}`} description={`AC repair, replacement, heat pumps, tune-ups and indoor air quality across ${biz.city}. Flat prices before any work. Call ${biz.phone}.`} trail={trail}>
+  <SiteHeader />
+  <Breadcrumbs trail={trail} />
+  <main id="top">
+    <section><div class="wrap">
+      <h1>Heating and cooling services in {biz.city}</h1>
+      <p class="lead">Each service has its own page with prices, what we do, and the questions people ask.</p>
+      <div class="grid-3" style="margin-top:24px">{services.map((s) => <a class="card rel" href={`${base}/services/${s.slug}/`}><h2 style="font-size:1.25rem">{s.name}</h2><p>{s.short}</p></a>)}</div>
+    </div></section>
+  </main>
+  <SiteFooter />
+</Base>

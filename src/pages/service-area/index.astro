@@ -1,0 +1,26 @@
+---
+import Base from '../../layouts/Base.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { biz } from '../../config';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const trail: [string, string][] = [['Home', `${base}/`], ['Service area', `${base}/service-area/`]];
+// A city gets its own page only when there's real proof to put on it (jobs, reviews, photos). Here: one worked example.
+const pages: Record<string, string> = { Clearwater: `${base}/service-area/clearwater/` };
+---
+<Base title={`Service Area: ${biz.city}, FL | ${biz.name}`} description={`Same-day AC and heating service in ${biz.areas.join(', ')}. Vans start each day in ${biz.base}.`} trail={trail}>
+  <SiteHeader />
+  <Breadcrumbs trail={trail} />
+  <main id="top">
+    <section><div class="wrap prose">
+      <h1>Where we work</h1>
+      <p class="lead">Vans start each day in {biz.base} and cover these towns. Most calls get a same-day window; we text it to you within a minute.</p>
+      <ul class="areas big">{biz.areas.map((a) => <li>{pages[a] ? <a href={pages[a]}>{a}</a> : a}</li>)}</ul>
+      <h2>Why only one town has its own page</h2>
+      <p>A town page should tell people something the other pages don't: local permits, the problems we see there, and jobs and reviews from that town. We add one when there's real proof to put on it, never as a copy with the name swapped.</p>
+      <p><a href={`${base}/services/`}>See all services</a> · <a href={`${base}/ac-repair-cost/`}>AC repair prices</a></p>
+    </div></section>
+  </main>
+  <SiteFooter />
+</Base>

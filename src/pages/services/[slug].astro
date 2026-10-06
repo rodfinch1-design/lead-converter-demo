@@ -1,0 +1,66 @@
+---
+import Base from '../../layouts/Base.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import LeadForm from '../../components/LeadForm.astro';
+import { biz } from '../../config';
+import { services, bySlug, type Service } from '../../data/services';
+export function getStaticPaths() { return services.map((s) => ({ params: { slug: s.slug }, props: { s } })); }
+const { s } = Astro.props as { s: Service };
+const lower = s.name.toLowerCase().replace(/\bac\b/g, 'AC');   // "AC repair" stays "AC repair" mid-sentence
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const home = new URL(`${base}/`, Astro.site).href;
+const trail: [string, string][] = [['Home', `${base}/`], ['Services', `${base}/services/`], [s.name, `${base}/services/${s.slug}/`]];
+const schema = [{ '@type': 'Service', name: s.name, serviceType: s.name, provider: { '@id': `${home}#business` },
+  areaServed: biz.areas.map((a) => ({ '@type': 'City', name: `${a}, FL` })) }];
+---
+<Base title={s.title} description={`${s.lead.split('. ')[0]}. Serving ${biz.areas.slice(0, 4).join(', ')} and more. Call ${biz.phone}.`} trail={trail} schema={schema}>
+  <SiteHeader />
+  <Breadcrumbs trail={trail} />
+  <main id="top">
+    <section class="hero page-hero">
+      <div class="wrap hero-grid">
+        <div>
+          <p class="eyebrow">{s.name} · {biz.city}</p>
+          <h1>{s.h1}</h1>
+          <p class="lead">{s.lead}</p>
+          <ul class="checks"><li>Same-day across {biz.city}</li><li>Flat price before any work</li><li>Licensed &amp; insured technicians</li></ul>
+          <div class="hero-ctas"><a class="btn btn-cta" href="#quote" data-place="svc-hero">Get my quote</a><a class="btn btn-ghost" href={biz.phoneHref} data-place="svc-hero">Call {biz.phone}</a></div>
+        </div>
+        <LeadForm need={s.need} />
+      </div>
+    </section>
+
+    <section><div class="wrap prose">
+      <h2>Signs you need {lower}</h2>
+      <ul>{s.signs.map((t) => <li>{t}</li>)}</ul>
+      <h2>How it works</h2>
+      <div class="grid-3">{s.steps.map(([t, d], i) => <div class="card step"><span class="num">{i + 1}</span><h3>{t}</h3><p>{d}</p></div>)}</div>
+    </div></section>
+
+    <section class="soft"><div class="wrap prose">
+      <h2>{s.name} prices in {biz.city}</h2>
+      {biz.demo && <p class="tag">Sample prices for a demo business</p>}
+      <table class="prices"><thead><tr><th>Job</th><th>Typical price</th></tr></thead><tbody>{s.prices.map(([a, b]) => <tr><td>{a}</td><td>{b}</td></tr>)}</tbody></table>
+      <p>You get one flat price before we start. The ${biz.diagnostic} diagnostic is waived when you go ahead. <a href={`${base}/ac-repair-cost/`}>See the full AC repair price guide</a>.</p>
+      <dl class="facts">{s.facts.map(([a, b]) => <div><dt>{a}</dt><dd>{b}</dd></div>)}</dl>
+    </div></section>
+
+    <section><div class="wrap prose">
+      <h2>Questions</h2>
+      <div class="faq">{s.faqs.map(([q, a]) => <details><summary>{q}</summary><p>{a}</p></details>)}</div>
+      <h2>Where we work</h2>
+      <p>Vans start each day in {biz.base} and cover {biz.areas.join(', ')}. <a href={`${base}/service-area/`}>See the service area</a>, or read about <a href={`${base}/service-area/clearwater/`}>AC service in Clearwater</a>.</p>
+      <h2>Related services</h2>
+      <div class="grid-2">{s.related.map((r) => <a class="card rel" href={`${base}/services/${r}/`}><h3>{bySlug[r].name}</h3><p>{bySlug[r].short}</p></a>)}</div>
+    </div></section>
+
+    <section class="final"><div class="wrap center">
+      <h2>Need {lower} today?</h2>
+      <p class="lead">Text or call. We reply in under {biz.responseSeconds} seconds, 7 days a week.</p>
+      <div class="hero-ctas" style="justify-content:center"><a class="btn btn-cta" href="#quote" data-place="svc-final">Get my quote</a><a class="btn btn-ghost" href={biz.phoneHref} data-place="svc-final">Call {biz.phone}</a></div>
+    </div></section>
+  </main>
+  <SiteFooter />
+</Base>

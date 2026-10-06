@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { biz } from '../config';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const trail: [string, string][] = [['Home', `${base}/`], ['AC repair prices', `${base}/ac-repair-cost/`]];
+// "How much does X cost in <city>" is where AI answers show up most (Whitespark: 92–97% of cost queries), so this page
+// states the numbers plainly. Demo prices are samples; a real company uses ranges from its own invoices.
+const rows: [string, string, string][] = [
+  ['Diagnostic visit', `$${biz.diagnostic}`, 'Waived if you go ahead with the repair'],
+  ['Clogged drain line', '$75–$250', 'The most common summer call'],
+  ['Run capacitor', '$150–$400', 'Fan or compressor hums but won’t start'],
+  ['Contactor', '$150–$350', 'Outdoor unit won’t switch on'],
+  ['Condenser fan motor', '$300–$700', 'Outdoor fan not spinning'],
+  ['Blower motor', '$400–$1,500', 'No air from the vents'],
+  ['Refrigerant leak search and repair', '$200–$1,500', 'Depends on where the leak is'],
+  ['Compressor', '$1,800–$3,500', 'Often time to compare with a new system'],
+];
+---
+<Base title={`How Much Does AC Repair Cost in ${biz.city}? (2026 Prices) | ${biz.name}`} description={`AC repair prices in ${biz.city}: drain lines from $75, capacitors $150–$400, compressors $1,800–$3,500. What changes the price, and when to replace instead.`} trail={trail}>
+  <SiteHeader />
+  <Breadcrumbs trail={trail} />
+  <main id="top">
+    <section><div class="wrap prose">
+      <h1>How much does AC repair cost in {biz.city}?</h1>
+      <p class="lead">Most AC repairs in {biz.city} cost <strong>$150 to $700</strong>. A clogged drain can be under $100; a compressor can pass $3,000. Here's the breakdown, and how to tell when replacing makes more sense.</p>
+      {biz.demo && <p class="tag">Sample prices for a demo business</p>}
+      <table class="prices"><thead><tr><th>Repair</th><th>Typical price</th><th>Usually means</th></tr></thead>
+        <tbody>{rows.map(([a, b, c]) => <tr><td>{a}</td><td>{b}</td><td>{c}</td></tr>)}</tbody></table>
+      <h2>What changes the price</h2>
+      <ul><li><strong>The part and the brand:</strong> some motors and boards are generic, others only come from the manufacturer.</li>
+        <li><strong>Refrigerant type:</strong> older systems use R-22, which is no longer made new, so recharging them costs more.</li>
+        <li><strong>Access:</strong> attic air handlers and rooftop condos take longer than a garage unit.</li>
+        <li><strong>Warranty:</strong> parts under a registered manufacturer warranty cut the bill to labor.</li></ul>
+      <h2>Repair or replace?</h2>
+      <p>A common rule of thumb: multiply the system's age by the repair price. Above about $5,000, get a replacement quote too. Under that, repairing usually wins. <a href={`${base}/services/ac-replacement/`}>How we size and price a new system</a>.</p>
+      <h2>Get your exact price</h2>
+      <p>We give one flat price after the diagnostic, before any work.</p>
+      <div class="hero-ctas"><a class="btn btn-cta" href={`${base}/services/ac-repair/#quote`} data-place="cost-guide">Get my exact price</a><a class="btn btn-ghost" href={biz.phoneHref} data-place="cost-guide">Call {biz.phone}</a></div>
+    </div></section>
+  </main>
+  <SiteFooter />
+</Base>

@@ -1,0 +1,10 @@
+# On a real domain this file sits at the root (example.com/robots.txt).
+# It never hides a page from Google: that's what the noindex tag is for, and a noindexed page must stay crawlable.
+User-agent: *
+Allow: /
+
+# Let ChatGPT's search crawler in, so the business can show up in ChatGPT answers.
+User-agent: OAI-SearchBot
+Allow: /
+
+Sitemap: https://rodfinch1-design.github.io/lead-converter-demo/sitemap-index.xml

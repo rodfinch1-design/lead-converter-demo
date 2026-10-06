@@ -1,0 +1,54 @@
+---
+import Base from '../../layouts/Base.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import LeadForm from '../../components/LeadForm.astro';
+import { biz } from '../../config';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const trail: [string, string][] = [['Home', `${base}/`], ['Service area', `${base}/service-area/`], ['Clearwater', `${base}/service-area/clearwater/`]];
+const s = biz.demo ? 'Sample ' : '';
+---
+<Base title={`AC Repair in Clearwater, FL | Same-Day | ${biz.name}`} description={`Same-day AC repair and replacement in Clearwater, from beach condos to Countryside homes. Salt-air coil care and permits handled. Call ${biz.phone}.`} trail={trail}
+      schema={[{ '@type': 'Service', name: 'AC repair in Clearwater, FL', serviceType: 'AC repair', provider: { '@id': `${new URL(`${base}/`, Astro.site).href}#business` }, areaServed: { '@type': 'City', name: 'Clearwater, FL' } }]}>
+  <SiteHeader />
+  <Breadcrumbs trail={trail} />
+  <main id="top">
+    <section class="hero page-hero">
+      <div class="wrap hero-grid">
+        <div>
+          <p class="eyebrow">Clearwater · Pinellas County</p>
+          <h1>AC repair in Clearwater, the same day</h1>
+          <p class="lead">From beach condos to homes in Countryside, Clearwater ACs fight two things the rest of the bay sees less of: salt air and older, tighter mechanical spaces.</p>
+          <div class="hero-ctas"><a class="btn btn-cta" href="#quote" data-place="city-hero">Get my quote</a><a class="btn btn-ghost" href={biz.phoneHref} data-place="city-hero">Call {biz.phone}</a></div>
+        </div>
+        <LeadForm />
+      </div>
+    </section>
+
+    <section><div class="wrap prose">
+      <h2>What's different about AC in Clearwater</h2>
+      <h3>Salt air eats outdoor coils</h3>
+      <p>Close to the Gulf, salt spray corrodes the aluminum fins and copper of outdoor units years earlier than inland. We rinse coils on every visit near the water, and for replacements we quote coastal-protected coils or coatings.</p>
+      <h3>Permits: city or county, depending on your address</h3>
+      <p>A system change-out in Florida needs a permit. Inside city limits it comes from the City of Clearwater; in unincorporated areas, from Pinellas County. We pull it and meet the inspector either way.</p>
+      <h3>Condos have their own rules</h3>
+      <p>Many beach buildings require licensed, insured contractors to register with the association before work, and limit work hours. We send the certificate of insurance ahead so the visit isn't held up at the front desk.</p>
+    </div></section>
+
+    <section class="soft"><div class="wrap prose">
+      <h2>Recent Clearwater jobs</h2>
+      {biz.demo && <p class="tag">Sample jobs: a real page lists the company's own, with photos</p>}
+      <ul>
+        <li><strong>{s}Island Estates condo:</strong> corroded outdoor coil, replaced with a coastal-coated unit. Same day.</li>
+        <li><strong>{s}Countryside:</strong> AC iced up from a clogged filter and low airflow; cleaned, tested, fixed in an hour.</li>
+        <li><strong>{s}Inland Clearwater:</strong> 16-year-old system replaced; permit from the City of Clearwater, inspection passed.</li>
+      </ul>
+      <h2>What Clearwater customers say</h2>
+      {biz.demo && <p class="tag">Sample review</p>}
+      <blockquote>“Tech showed me the rust on the coil before quoting anything. New unit in that afternoon.” <cite>Sample review, Clearwater Beach</cite></blockquote>
+      <p><a href={`${base}/services/ac-repair/`}>AC repair</a> · <a href={`${base}/services/ac-replacement/`}>AC replacement</a> · <a href={`${base}/services/maintenance/`}>Tune-ups for coastal homes</a> · <a href={`${base}/service-area/`}>All towns we serve</a></p>
+    </div></section>
+  </main>
+  <SiteFooter />
+</Base>

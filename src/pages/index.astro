@@ -2,12 +2,18 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import LeadForm from '../components/LeadForm.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { services as svcPages } from '../data/services';
 import { biz } from '../config';
 import hero from '../assets/hero.png';
 import door from '../assets/door.png';
 import van from '../assets/van.png';
 
 const s = biz.demo ? 'sample ' : '';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const svcHref: Record<string, string> = { 'AC repair': `${base}/services/ac-repair/`, 'AC tune-up': `${base}/services/maintenance/`,
+  'New AC systems': `${base}/services/ac-replacement/`, 'Heating repair': `${base}/services/heating/`, 'Indoor air quality': `${base}/services/indoor-air-quality/` };
 const steps = [
   ['Tell us what’s wrong', 'Three quick questions or one phone call. Takes about a minute.'],
   ['We text you back in under 60 seconds', 'A real person confirms the price range and books a time that suits you, today when you need it.'],
@@ -36,16 +42,7 @@ const faqs = [
 ---
 <Base title={`AC Repair ${biz.city} | Same-Day Service | ${biz.name}`}
       description={`Same-day AC repair across ${biz.city}. Upfront pricing, licensed techs, 1-year guarantee. Text or call ${biz.phone}. We reply in under 60 seconds.`}>
-  <header class="site">
-    <div class="wrap">
-      <a class="logo" href="#top" aria-label={`${biz.name} home`}>
-        <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="#0b5fa5"/><path d="M17 7v20M8.3 12l17.4 10M8.3 22l17.4-10" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
-        <span>{biz.name}</span>
-      </a>
-      <a class="head-phone" href={biz.phoneHref} data-place="header">{biz.phone}</a>
-      <a class="btn btn-cta head-call" href={biz.phoneHref} data-place="header-btn">Call now</a>
-    </div>
-  </header>
+  <SiteHeader />
 
   <main id="top">
     <section class="hero">
@@ -108,8 +105,8 @@ const faqs = [
         <p class="eyebrow center">Services</p>
         <h2 class="center">Everything that keeps your home comfortable</h2>
         <div class="grid-3" style="margin-top:28px">
-          {services.map(([t, d]) => (
-            <div class="svc"><span class="ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg></span><div><h3>{t}</h3><p>{d}</p></div></div>
+          {services.map(([t, d], i) => (
+            <div class="svc"><span class="ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg></span><div><h3>{svcHref[t] ? <a href={svcHref[t]}>{t}</a> : t}</h3><p>{d}</p></div></div>
           ))}
         </div>
       </div>
@@ -138,7 +135,8 @@ const faqs = [
           <p class="eyebrow">Service area</p>
           <h2>Serving all of {biz.city}</h2>
           <p class="lead">Fully stocked vans are spread across the bay, so a tech is usually close by.</p>
-          <ul class="areas">{biz.areas.map((a) => <li>{a}</li>)}</ul>
+          <ul class="areas">{biz.areas.map((a) => <li>{a === 'Clearwater' ? <a href={`${base}/service-area/clearwater/`}>{a}</a> : a}</li>)}</ul>
+          <p style="margin-top:14px"><a href={`${base}/service-area/`}>See the whole service area</a></p>
         </div>
         <Image src={van} alt="A stocked service van in a driveway with its rear doors open" widths={[360, 560, 800, 1100]} sizes="(min-width: 900px) 540px, calc(100vw - 32px)" loading="lazy" />
       </div>
@@ -166,16 +164,5 @@ const faqs = [
     </section>
   </main>
 
-  <footer class="site">
-    <div class="wrap">
-      <p><strong>{biz.name}</strong> · {biz.city}, FL · <a href={biz.phoneHref} data-place="footer">{biz.phone}</a> · {biz.hours}</p>
-      <p>{biz.license}{biz.demo && ' · Demo site: a sample business built for a Service Hawk tutorial.'}</p>
-    </div>
-  </footer>
-
-  <nav class="sticky-bar" aria-label="Quick contact">
-    <a class="btn btn-ghost" href={biz.phoneHref} data-place="sticky">Call</a>
-    <a class="btn btn-ghost" href={biz.smsHref} data-place="sticky">Text</a>
-    <a class="btn btn-cta" href="#quote" data-place="sticky">Get quote</a>
-  </nav>
+  <SiteFooter />
 </Base>
